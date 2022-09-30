@@ -1,7 +1,11 @@
 import logo from './logo.svg';
 import './App.css';
+import { populateReservations, populateRooms, populateUsers } from './Utils/Mocks';
 
 function App() {
+  populateRooms();
+  populateUsers();
+  populateReservations();
   return (
     <div className="App">
       <header className="App-header">
