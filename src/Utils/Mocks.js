@@ -2,8 +2,7 @@ import { faker } from "@faker-js/faker";
 import { createReservation, getReservations } from "../API/ReservationsAPI";
 import { createRooms, getRooms } from "../API/RoomsAPI";
 import { createUser, getUsers } from "../API/UsersAPI";
-import { settings } from "../Configs/settings";
-//import { updateData } from './Files';
+import { areValidReservationDates } from "./Validators";
 
 faker.setLocale("es_MX");
 const amenity = () => ({
@@ -70,29 +69,12 @@ export const populateUsers = async (quantity = 40) => {
 const from = () => faker.date.soon(60);
 const to = (from) => faker.date.soon(30, from);
 const reservationTemplate = (email, code, checkIn, checkOut) => ({
+  id: `${(checkIn.getFullYear()+'').slice(2)}${checkIn.getDate()}${checkIn.getMonth()+1}${checkOut.getDate()}${checkOut.getMonth()+1}${code}`,
   checkIn,
   checkOut,
   user: email,
   room: code,
 });
-const isDateBetweenDates = (check, from, to) => {
-  return (check>from) && (check<to);
-}
-const isDateEarlierThanDate = (check, from, to) => {
-  return (check<from);
-}
-
-const areValidDates = (reservations, checkIn, checkOut) => {
-  if (reservations.length===0) return true;
-  reservations.map((reservation) => {
-    if (isDateBetweenDates(checkIn, reservation.checkIn, reservation.checkOut)) {
-      return false;
-    }
-    if (!isDateEarlierThanDate(checkOut, reservation.checkIn)) {
-      return false;
-    }
-  })
-}
 
 export const populateReservations = async (quantity = 45) => {
   let response = await getReservations();
@@ -106,11 +88,10 @@ export const populateReservations = async (quantity = 45) => {
   
   faker.helpers.shuffle(users)[0].map((user, index) => {
     const room = faker.helpers.arrayElement(...rooms);
-    console.log("🚀 ~ file: Mocks.js ~ line 109 ~ faker.helpers.shuffle ~ room", room)
     const roomReservations = reservations.filter((reservation) => reservation.room === room.code);
     let checkIn = from();
     let checkOut = to(checkIn);
-    while (!areValidDates(roomReservations, checkIn, checkOut)) {
+    while (!areValidReservationDates(roomReservations, checkIn, checkOut)) {
       checkIn = from();
       checkOut = to(checkIn);
     }

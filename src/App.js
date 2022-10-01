@@ -1,5 +1,5 @@
 import logo from './logo.svg';
-import './App.css';
+import './App.scss';
 import { populateReservations, populateRooms, populateUsers } from './Utils/Mocks';
 
 function App() {
