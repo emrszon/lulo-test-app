@@ -1,8 +1,8 @@
 import { faker } from "@faker-js/faker";
-import { createReservation, getReservations } from "../API/ReservationsAPI";
+import { createBooking, getBookings } from "../API/BookingsAPI";
 import { createRooms, getRooms } from "../API/RoomsAPI";
 import { createUser, getUsers } from "../API/UsersAPI";
-import { areValidReservationDates } from "./Validators";
+import { areValidBookingDates } from "./Validators";
 
 faker.setLocale("es_MX");
 const amenity = () => ({
@@ -68,34 +68,44 @@ export const populateUsers = async (quantity = 40) => {
 
 const from = () => faker.date.soon(60);
 const to = (from) => faker.date.soon(30, from);
-const reservationTemplate = (email, code, checkIn, checkOut) => ({
-  id: `${(checkIn.getFullYear()+'').slice(2)}${checkIn.getDate()}${checkIn.getMonth()+1}${checkOut.getDate()}${checkOut.getMonth()+1}${code}`,
+export const bookingTemplate = (email, code, checkIn, checkOut) => ({
+  id: `${(checkIn.getFullYear() + "").slice(2)}${checkIn.getDate()}${
+    checkIn.getMonth() + 1
+  }${checkOut.getDate()}${checkOut.getMonth() + 1}${code}`,
   checkIn,
   checkOut,
   user: email,
   room: code,
 });
 
-export const populateReservations = async (quantity = 45) => {
-  let response = await getReservations();
+export const populateBookings = async (quantity = 45) => {
+  let response = await getBookings();
   if (response.length > 0) {
     return;
   }
   let users = await getUsers();
   let rooms = await getRooms();
-  let reservations = await getReservations();
-  const RESERVATIONS = [];
-  
-  faker.helpers.shuffle(users)[0].map((user, index) => {
-    const room = faker.helpers.arrayElement(...rooms);
-    const roomReservations = reservations.filter((reservation) => reservation.room === room.code);
+  let bookings = await getBookings();
+  const BOOKINGS_TO_SAVE = [];
+
+  faker.helpers.shuffle(users).map((user, index) => {
+    const room = faker.helpers.arrayElement(rooms);
+    const roomBookings = BOOKINGS_TO_SAVE.filter(
+      (booking) => booking.room === room.code
+    );
     let checkIn = from();
     let checkOut = to(checkIn);
-    while (!areValidReservationDates(roomReservations, checkIn, checkOut)) {
-      checkIn = from();
-      checkOut = to(checkIn);
+    const valid = areValidBookingDates(roomBookings, checkIn, checkOut)
+    if (roomBookings.length !== 0) {
+      while (!areValidBookingDates(roomBookings, checkIn, checkOut)) {
+        checkIn = from();
+        checkOut = to(checkIn);
+      }
     }
-    RESERVATIONS.push(reservationTemplate(user.email, room.code, checkIn, checkOut));
-    });
-  await createReservation(RESERVATIONS)
+    BOOKINGS_TO_SAVE.push(
+      bookingTemplate(user.email, room.code, checkIn, checkOut)
+    );
+  });
+  await Promise.all(BOOKINGS_TO_SAVE.map((booking) => createBooking(booking)))
+  //await createBooking(RESERVATIONS)
 };

@@ -17,11 +17,11 @@ export const createRooms = async (rooms) => {
         reject(err)});
   });
 };
-export const getRooms =  () => {
+export const getRooms =  (roomCode) => {
   return new Promise((resolve, reject) => {
     axios
       .get(
-        `${settings.baseAPIURL}/rooms`,
+        `${settings.baseAPIURL}/rooms?${roomCode? `code=${roomCode}`:''}`,
       )
       .then((res) => {
         const data = res.data;

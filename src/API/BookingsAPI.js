@@ -1,11 +1,11 @@
 import axios from "axios";
 import { settings } from "../Configs/settings";
 
-export const createReservation = async (data) => {
+export const createBooking = async (data) => {
   return new Promise((resolve, reject) => {
     axios
       .post(
-        `${settings.baseAPIURL}/reservations`,
+        `${settings.baseAPIURL}/bookings`,
         data,
       )
       .then((res) => {
@@ -13,22 +13,22 @@ export const createReservation = async (data) => {
         resolve(data);
       })
       .catch((err) => {
-        console.log("create reservation error: ", err);
+        console.log("create booking error: ", err);
         reject(err)});
   });
 };
-export const getReservations = (roomCode) => {
+export const getBookings = (roomCode) => {
   return new Promise((resolve, reject) => {
     axios
       .get(
-        `${settings.baseAPIURL}/reservations/${roomCode ? roomCode :''}`,
+        `${settings.baseAPIURL}/bookings/${roomCode ? `?room=${roomCode}` :''}`,
       )
       .then((res) => {
         const data = res.data;
         resolve(data);
       })
       .catch((err) => {
-        console.log("Get reservation error: ", err);
+        console.log("Get booking error: ", err);
         reject(err)});
   });
 };

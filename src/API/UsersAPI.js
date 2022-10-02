@@ -17,11 +17,11 @@ export const createUser = async (data) => {
         reject(err)});
   });
 };
-export const getUsers =  () => {
+export const getUsers =  (email=undefined) => {
   return new Promise((resolve, reject) => {
     axios
       .get(
-        `${settings.baseAPIURL}/users`,
+        `${settings.baseAPIURL}/users/${email ? `?email=${email}` :''}`,
       )
       .then((res) => {
         const data = res.data;
