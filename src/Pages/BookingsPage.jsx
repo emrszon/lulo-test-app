@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Col, Container, Row } from "react-bootstrap";
+import { Button, Col, Container, Row, Toast } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { createBooking, getBookings } from "../API/BookingsAPI";
 import { getRooms } from "../API/RoomsAPI";
@@ -8,6 +8,7 @@ import BookingForm from "../Components/BookingForm/BookingForm";
 import { useQuery } from "../Utils/Hooks";
 import { v4 as uuidv4 } from 'uuid';
 import { bookingTemplate } from "../Utils/Mocks";
+import RoomDetails from "../Components/RoomDetails/RoomDetails";
 
 const BookingsPage = ({ }) => {
   const query = useQuery();
@@ -15,6 +16,7 @@ const BookingsPage = ({ }) => {
   const [roomCode, setRoomCode] = useState(query.get("roomCode")|| undefined);
   const [selectedRoom, setSelectedRoom] = useState(undefined);
   const [selectedRoomBookings, setSelectedRoomBookings] = useState(undefined);
+  const [show, setShow] = useState(false);
 
   const fetchRoomInfo = async (roomCode) => {
     try {
@@ -60,14 +62,27 @@ const BookingsPage = ({ }) => {
       <h1 >
         Bookings
       </h1>
+      <Toast bg={"danger"} className="w-100" onClose={() => setShow(false)} show={show} delay={10000} autohide>
+          <Toast.Header>
+            <img
+              src="holder.js/20x20?text=%20"
+              className="rounded me-2"
+              alt=""
+            />
+            <strong className="me-auto">Error</strong>
+          </Toast.Header>
+          <Toast.Body>Invalid Check-In/Check-Out dates!.</Toast.Body>
+      </Toast>
       {selectedRoom && (
         <Row>
-          <Col>
-          <h2> Room details</h2>
+          <Col lg="6">
+          <h3> Room details</h3>
+          <h4>{`${selectedRoom?.code} - ${selectedRoom?.name}`}</h4>
+          <RoomDetails room={{...selectedRoom, bookings: selectedRoomBookings}} defaultActiveKey="1" />
           </Col>
-          <Col>
-          <h2> New Booking</h2>
-            <BookingForm bookings={selectedRoomBookings} handleSubmit={handleSubmit} code={selectedRoom.code} />
+          <Col lg="6">
+          <h3> New Booking</h3>
+            <BookingForm bookings={selectedRoomBookings} handleSubmit={handleSubmit} code={selectedRoom?.code} setShow={setShow} />
           </Col>
         </Row>
       )}

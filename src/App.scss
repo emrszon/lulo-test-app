@@ -1,6 +1,9 @@
 @import "~bootstrap/scss/bootstrap";
+@import "./assets/variables.scss";
 .App {
   text-align: center;
+  min-height: 100vh;
+  background-color: $app-backgrond;
 }
 
 .App-logo {

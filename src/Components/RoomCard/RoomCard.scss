@@ -1,7 +1,10 @@
+@import "../../assets/variables.scss";
 .room-card{
   .btn-outline-white{
+    background-color: $app-backgrond;
     &:hover{
-      border: 1px solid blue;
+      background-color: white;
+      border: 1px solid #0d6efd;
     }
   }
 }

@@ -6,20 +6,19 @@ import * as yup from 'yup';
 import { add, endOfDay, format, startOfDay, sub } from "date-fns";
 import { calendarizeDate } from "../../Utils/Formatters";
 import { areValidBookingDates } from "../../Utils/Validators";
+import { Link } from "react-router-dom";
 
-const BookingForm = ({handleSubmit, thisUserExist, bookings, code}) => {
+const BookingForm = ({handleSubmit, thisUserExist, bookings, code, setShow}) => {
   
 const schema = yup.object().shape({
   email: yup.string().email().required(),
-  birthdate: yup.date().max(sub(new Date(), {years:18})).required(),
   firstName: yup.string().required(),
   lastName: yup.string().required(),
   phoneNumber: yup.string().required(),
+  birthdate: yup.date().max(sub(new Date(), {years:18})).required(),
   checkIn: yup.date().min(startOfDay(new Date())).required(),
   checkOut: yup.date().min(endOfDay(new Date())).required(),
 });
-
-const [show, setShow] = useState(false);
   return (
     <Formik
       validationSchema={schema}
@@ -51,11 +50,11 @@ const [show, setShow] = useState(false);
         errors,
       }) => (
         <Form noValidate onSubmit={handleSubmit}>
-          <h3>
+          <h5>
             User Info
-          </h3>
+          </h5>
           <Row className="mb-3">
-            <Form.Group as={Col} md="8" controlId="validationFormik03">
+            <Form.Group as={Col} md="8" >
               <Form.Label>Email</Form.Label>
               <Form.Control
                 type="email"
@@ -94,7 +93,7 @@ const [show, setShow] = useState(false);
                 placeholder="First Name"
                 value={values.firstName}
                 onChange={handleChange}
-                isValid={touched.firstName && !errors.firstName}
+                isInvalid={!!errors.firstName}
               />
               <Form.Control.Feedback type="invalid">
                 {errors.firstName}
@@ -108,7 +107,7 @@ const [show, setShow] = useState(false);
                 name="lastName"
                 value={values.lastName}
                 onChange={handleChange}
-                isValid={touched.lastName && !errors.lastName}
+                isInvalid={!!errors.lastName}
               />
               <Form.Control.Feedback type="invalid">
                 {errors.lastName}
@@ -122,18 +121,18 @@ const [show, setShow] = useState(false);
                 name="phoneNumber"
                 value={values.phoneNumber}
                 onChange={handleChange}
-                isValid={touched.phoneNumber && !errors.phoneNumber}
+                isInvalid={!!errors.phoneNumber}
               />
               <Form.Control.Feedback type="invalid">
                 {errors.phoneNumber}
               </Form.Control.Feedback>
             </Form.Group>
           </Row>
-          <h3>
+          <h5>
             Booking Info
-          </h3>
+          </h5>
           <Row className="mb-3">
-          <Form.Group as={Col} md="6" controlId="validationFormik04">
+          <Form.Group as={Col} md="6" controlId="validationFormik05">
               <Form.Label>Check-In</Form.Label>
               <Form.Control
                 type="date"
@@ -147,7 +146,7 @@ const [show, setShow] = useState(false);
                 {errors.checkIn}
               </Form.Control.Feedback>
             </Form.Group>
-            <Form.Group as={Col} md="6" controlId="validationFormik04">
+            <Form.Group as={Col} md="6" controlId="validationFormik06">
               <Form.Label>Check-Out</Form.Label>
               <Form.Control
                 type="date"
@@ -162,21 +161,19 @@ const [show, setShow] = useState(false);
               </Form.Control.Feedback>
             </Form.Group>
           </Row>
-          <Toast bg={"danger"} className="w-100" onClose={() => setShow(false)} show={show} delay={10000} autohide>
-          <Toast.Header>
-            <img
-              src="holder.js/20x20?text=%20"
-              className="rounded me-2"
-              alt=""
-            />
-            <strong className="me-auto">Error</strong>
-          </Toast.Header>
-          <Toast.Body>Invalid Check-In/Check-Out dates!.</Toast.Body>
-        </Toast>
-          <Button onClick={(e)=>{
+          <Row>
+            
+          
+          <Col>
+          <Link to="/rooms">Back to Rooms</Link>
+          <Button className="px-5 mx-2" onClick={(e)=>{
             e.preventDefault();
             handleSubmit(values);
-          }} type="submit" >Submit form</Button>
+          }} type="submit" >Save Booking</Button>
+          </Col>
+            
+          </Row>
+          
         </Form>
       )}
     </Formik>
